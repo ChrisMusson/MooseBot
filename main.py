@@ -1,17 +1,19 @@
+import datetime
 import logging
 import os
 import subprocess
 
 import discord
 from discord.commands import Option
-from discord.ext import commands
+from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 from bonus import bonus
+from price_changes import get_price_changes
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_IDS = [1140257494732656730]
+GUILD_IDS = [1140257494732656730, 1305324615890894878]
 
 logger = logging.getLogger("discord")
 logger.setLevel(logging.DEBUG)
@@ -23,9 +25,21 @@ logger.addHandler(handler)
 bot = discord.Bot()
 
 
+@tasks.loop(time=datetime.time(hour=1, minute=29, second=50))
+async def job_price_changes():
+    price_change_str = get_price_changes()
+    channel = bot.get_channel(1303145895252197498)
+
+    if not channel:
+        return
+
+    await channel.send(f"```\n{price_change_str}\n```")
+
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
+    job_price_changes.start()
 
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Connect to a VPN")
@@ -78,4 +92,5 @@ async def bps(
         await ctx.respond(f"Sorry, that failed. Error:\n{e}")
 
 
-bot.run(TOKEN)
+if __name__ == "__main__":
+    bot.run(TOKEN)
