@@ -4,6 +4,7 @@ import subprocess
 
 import discord
 from discord.commands import Option
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from bonus import bonus
@@ -28,12 +29,14 @@ async def on_ready():
 
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Connect to a VPN")
+@commands.is_owner()
 async def connect(ctx):
     subprocess.Popen("nordvpn connect", shell=True).wait()
     await ctx.respond("Connected to VPN")
 
 
 @bot.slash_command(guild_ids=GUILD_IDS, description="Disconnect from a VPN")
+@commands.is_owner()
 async def disconnect(ctx):
     subprocess.Popen("nordvpn disconnect", shell=True).wait()
     await ctx.respond("Disonnected from VPN")
