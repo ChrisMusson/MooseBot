@@ -28,7 +28,7 @@ bot = discord.Bot()
 @tasks.loop(time=datetime.time(hour=1, minute=29, second=50))
 async def job_price_changes():
     price_change_str = get_price_changes()
-    channel = bot.get_channel(1303145895252197498)
+    channel = bot.get_channel(1305324655984246834)
 
     if not channel:
         return
